@@ -46,7 +46,7 @@ export default defineConfig({
         viewport:{width:1366, height:768},
         channel:'chrome',
         baseURL: 'https://opensource-demo.orangehrmlive.com/',
-        storageState: 'storage/auth.json',
+       // storageState: 'storage/auth.json',
        },
   
     },
