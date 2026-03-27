@@ -37,16 +37,21 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+     {
+      name: 'setup',
+      testMatch: /auth\.setup\.spec\.ts/,
+    },
     {
       name: 'chromium',
+      dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'],
         screenshot:"on-first-failure",
         trace:"retain-on-failure",
         video:"retain-on-failure",
         viewport:{width:1366, height:768},
         channel:'chrome',
-        baseURL: 'https://opensource-demo.orangehrmlive.com/',
-       // storageState: 'storage/auth.json',
+        //baseURL: 'https://opensource-demo.orangehrmlive.com/',
+        storageState: 'storage/auth.json',
        },
   
     },

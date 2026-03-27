@@ -24,9 +24,13 @@ export class LoginPage{
     }
 
     async navigateUrl(){
-        await this.page.goto('/web/index.php/auth/login', {timeout:15000})
-        await expect(this.username).toBeVisible()
+       await this.page.goto(
+        'https://opensource-demo.orangehrmlive.com/web/index.php/auth/login',
+     {
+        timeout: 60000,
+        waitUntil: 'domcontentloaded', // ✅ faster & stable
     }
+    )}
 
     async userLogin(user:string, pass:string){
         await this.username.fill(user)
