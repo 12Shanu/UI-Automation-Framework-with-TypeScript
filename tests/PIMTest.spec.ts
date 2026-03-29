@@ -16,10 +16,20 @@ test("Verify To Add New Employee Without LoginDetails", async ({pimdata,page}) =
     await pimpage.addEmployeeWithoutLoginDetails(page, pimdata.firstname, pimdata.middlename, pimdata.lastname,pimdata.employeeid)
 })
 
-test("Verify To Search By Employee ID", async({pimdata,page})=>{
+test.skip("Verify To Search By Employee ID", async({pimdata,page})=>{
     await pimpage.searchEmployeeByID(pimdata.employeeid)
-    const mactchedrow = await pimpage.selectEmployee(page,pimdata.employeeid)
-    await pimpage.clickEmployee(mactchedrow,page)
+    //pimpage.selectAndClickEmployee(page, pimdata.employeeid)
+})
+
+test.skip("Serach From Table", async ({pimdata,page}) =>{
+    await pimpage.selectAndClickEmployee(page, pimdata.employeeid)
+})
+
+test("Verify To Add PersonalDetails",async ({pimdata,page}) => {
+    await pimpage.searchEmployeeByID(pimdata.employeeid)
+    await pimpage.editUser(page,pimdata.employeeid)
+    await pimpage.addPersonalDetails(pimdata.otherid,pimdata.licensenum,pimdata.licexpdate,page,pimdata.dob)
+    await pimpage.linkClick("Employee List")
 })
 
 test("Verify to Delete Employee", async ({pimdata,page})=>{

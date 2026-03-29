@@ -1,4 +1,5 @@
 import { expect, Locator, Page } from "@playwright/test";
+import { waitForDebugger } from "node:inspector";
 
 export class PIMPage{
     page:Page
@@ -11,6 +12,13 @@ export class PIMPage{
     readonly pimlink
     readonly search_btn
     readonly alert_delete
+    readonly otherid
+    readonly licensenumber
+    readonly licenseexpirydate
+    readonly nationalitydropdown
+    readonly maritalstatus
+    readonly dob
+    readonly gender
 
     constructor(page:Page){
         this.page =page
@@ -23,6 +31,13 @@ export class PIMPage{
         this.pimlink = page.getByRole('link')
         this.search_btn = page.getByRole('button', {name: 'Search'})
         this.alert_delete = page.getByRole('button', { name: 'Yes, Delete' })
+        this.otherid =page.locator("//label[text()='Other Id']/../../div//input")
+        this.licensenumber = page.locator("//label[contains(text(),'License Number')]/../../div//input")
+        this.licenseexpirydate = page.locator("//label[contains(text(),'License Expiry')]/../../div//input")
+        this.nationalitydropdown = page.locator("//label[contains(text(),'Nationality')]/../..//div[@class='oxd-select-wrapper']")
+        this.maritalstatus = page.locator("//label[contains(text(),'Marital Status')]/../..//div[@class='oxd-select-wrapper']")
+        this.dob = page.locator("//label[contains(text(),'Date of Birth')]/../../div//input")
+        this.gender = page.getByLabel('Female')
     }
 
     async addEmployeeWithoutLoginDetails(page:Page, firstname:string, middlename:string, lastname:string, employeeid:string){
@@ -41,6 +56,7 @@ export class PIMPage{
     }
 
     async linkClick(link:string){
+        await this.pimlink.filter({hasText: link}).isVisible()
         await this.pimlink.filter({hasText: link}).click()
     }
 
@@ -49,62 +65,66 @@ export class PIMPage{
         await this.search_btn.click()
     }
 
-    async selectEmployee(page:Page,employeeid:string){
-        const table = page.locator('div.oxd-table-body')
-        const rows = table.locator('div.oxd-table-card')
-        const mactchedrow = rows.filter({
-            has: page.locator(`text=${employeeid}`)
-        })
-        
-        await expect(mactchedrow).toBeVisible({ timeout: 15000 });
-        return mactchedrow
+//     
 
-        // if(action.includes('onclick')){
-        //     await mactchedrow.click()
-        // }else if(action.includes('delete')) {
-        //     await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[2]/i`).click()
-        //     await this.alert_delete.click()
-        // }else if(action.includes('validateuser')){
-        //     const employeeRow = page.locator('.oxd-table-body').getByText(employeeid);
-        //     await expect(employeeRow).toBeVisible({ timeout: 15000 })
-        // }
-    }
+async selectAndClickEmployee(page: Page, employeeId: string) {
 
-    async clickEmployee(matchedRow: Locator, page: Page) {
+    await page.locator("//ul[@class='oxd-pagination__ul']/li").first().scrollIntoViewIfNeeded()
+    const pagination = page.locator("//ul[@class='oxd-pagination__ul']/li");
+    
+    const totalPages = await pagination.count();
 
-        const pagination = page.locator("//ul[@class='oxd-pagination__ul']/li");
+    console.log("Total pagination items:", totalPages);
 
-        const totalPages = await pagination.count();
-        console.log("Total pagination items:", totalPages);
+    // Function to get fresh matched row every time
+    const getMatchedRow = () => {
+        const table = page.locator('div.oxd-table-body');
+        const rows = table.locator('div.oxd-table-card');
 
-    // ✅ If no pagination OR only single page → directly click
-        if (totalPages <= 1) {
-        if (await matchedRow.isVisible()) {
-            await matchedRow.click();
+        return rows.filter({
+            has: page.locator(`text=${employeeId}`)
+        });
+    };
+
+    // 🔹 Case 1: No pagination OR single page
+    if (totalPages <= 1) {
+        const matchedRow = getMatchedRow();
+
+        if (await matchedRow.count() > 0) {
+            await matchedRow.first().click();
+            return matchedRow;
         } else {
-            throw new Error("Employee not found on single page");
-        }
-        return;
-    }
-
-    // ✅ Pagination exists → loop through pages
-        for (let i = 2; i < totalPages - 2; i++) {
-
-        if (await matchedRow.isVisible()) {
-            await matchedRow.click();
-            break;
-        } else {
-            await page.getByRole('button', { name: `${i}` }).click();
-            await page.waitForLoadState('networkidle');
-
-            console.log(`Navigated to page ${i}`);
+            throw new Error(`Employee ${employeeId} not found`);
         }
     }
 
+    // 🔹 Case 2: Multiple pages → loop through pages
+    for (let i = 1; i <= totalPages - 2; i++) {
+
+        const matchedRow = getMatchedRow();
+
+        if (await matchedRow.count() > 0) {
+            console.log(`Employee found on page ${i}`);
+            await matchedRow.first().click();
             await page.waitForURL(/viewPersonalDetails/);
+            return matchedRow;
+        }
+
+        // Navigate to next page
+        const nextPageBtn = page.getByRole('button', { name: `${i + 1}` });
+
+        if (await nextPageBtn.isVisible()) {
+            await nextPageBtn.click();
+            await page.waitForLoadState('networkidle');
+            console.log(`Navigated to page ${i + 1}`);
+        }
+    }
+
+    throw new Error(`Employee ${employeeId} not found in any page`);
 }
         
     async deleteEmployee(page:Page,employeeid: string) { 
+        await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[2]/i`).isVisible()
         await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[2]/i`).click()
         await this.alert_delete.click()
     }
@@ -112,5 +132,29 @@ export class PIMPage{
     async validateEmployee(page:Page, employeeid: string) { 
         const employeeRow = page.locator('.oxd-table-body').getByText(employeeid);
         await expect(employeeRow).toBeVisible({ timeout: 15000 })
+    }
+
+    async editUser(page:Page,employeeid: string){
+        await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[1]/i`).isVisible()
+        await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[1]/i`).click()
+        await expect(page.getByRole('heading', { name: 'Personal Details' })).toBeVisible()
+    }
+
+    async addPersonalDetails(otherid:string,licensenum:string,expirydate:string,page:Page,dob:string){
+        await this.otherid.click()
+        await this.otherid.fill(otherid)
+        await this.licensenumber.click()
+        await this.licensenumber.fill(licensenum)
+        await this.licenseexpirydate.fill(expirydate)
+        await this.nationalitydropdown.click()
+        await page.getByText('Indian').waitFor()
+        await page.getByText('Indian').click()
+        await this.maritalstatus.click()
+        await page.getByText('Married').waitFor()
+        await page.getByText('Married').click()
+        await this.dob.fill(dob)
+       // await this.gender.click()
+       // await page.pause()
+        await page.locator('button').filter({ hasText: 'Save' }).first().click()
     }
 }
