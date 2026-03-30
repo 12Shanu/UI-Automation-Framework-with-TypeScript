@@ -1,5 +1,7 @@
 import {test,expect} from "../fixture/testfixture"
 
+
+
 test("Verify Login With Valid Credential", async ({loginPage, loginData,page}) =>{
     await loginPage.navigateUrl()
     await loginPage.userLogin(loginData.username, loginData.password)
@@ -12,7 +14,7 @@ test("Verify Login With InValid Credential", async ({loginPage, loginData,page})
     await expect(page.getByText('Invalid credentials', { exact: true })).toBeVisible()
 })
 
-test.skip("Verify Forgot Functionality", async ({loginPage, loginData, page}) =>{
+test("Verify Forgot Functionality", async ({loginPage, loginData, page}) =>{
     await loginPage.navigateUrl()
     await loginPage.forgotPassword(page, loginData.username)
 })

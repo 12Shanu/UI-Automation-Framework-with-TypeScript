@@ -47,12 +47,11 @@ export class PIMPage{
         await this.firstname.fill(firstname)
         await this.middlename.fill(middlename)
         await this.lastname.fill(lastname)
-        await this.employeeid.fill(employeeid) 
+        await this.employeeid.fill(employeeid)
         await Promise.all([
             page.waitForURL(/viewPersonalDetails/),
             this.save_btn.click()
         ])
-        await expect(page.getByRole('heading', { name: 'Personal Details' })).toBeVisible()
     }
 
     async linkClick(link:string){
@@ -60,14 +59,14 @@ export class PIMPage{
         await this.pimlink.filter({hasText: link}).click()
     }
 
-    async searchEmployeeByID(employeeid:string){
+    async searchEmployeeByID(employeeid:string,page:Page){
+        await this.search_btn.isVisible()
         await this.employeeid.fill(employeeid)
         await this.search_btn.click()
+        await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[2]/i`).isVisible()
     }
 
-//     
-
-async selectAndClickEmployee(page: Page, employeeId: string) {
+    async selectAndClickEmployee(page: Page, employeeId: string) {
 
     await page.locator("//ul[@class='oxd-pagination__ul']/li").first().scrollIntoViewIfNeeded()
     const pagination = page.locator("//ul[@class='oxd-pagination__ul']/li");
@@ -157,4 +156,5 @@ async selectAndClickEmployee(page: Page, employeeId: string) {
        // await page.pause()
         await page.locator('button').filter({ hasText: 'Save' }).first().click()
     }
+
 }

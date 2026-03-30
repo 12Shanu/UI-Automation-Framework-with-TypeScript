@@ -10,31 +10,42 @@ test.beforeEach(async ({page,loginPage,dashboardPage}) => {
     await expect(page).toHaveURL(/pim\/viewEmployeeList/)
 })
 
-test.describe.serial("PIM MODULE TEST CASES", () =>{
+test.describe("PIM MODULE TEST CASES", () =>{
 
 test("Verify To Add New Employee Without LoginDetails", async ({pimdata,page}) =>{
     await pimpage.addEmployeeWithoutLoginDetails(page, pimdata.firstname, pimdata.middlename, pimdata.lastname,pimdata.employeeid)
+    await expect(page.getByRole('heading', { name: 'Personal Details' })).toBeVisible()
+    await pimpage.linkClick("Employee List")
+    await pimpage.searchEmployeeByID(pimdata.employeeid,page)
+    await pimpage.deleteEmployee(page,pimdata.employeeid)
 })
 
-test.skip("Verify To Search By Employee ID", async({pimdata,page})=>{
-    await pimpage.searchEmployeeByID(pimdata.employeeid)
-    //pimpage.selectAndClickEmployee(page, pimdata.employeeid)
-})
-
-test.skip("Serach From Table", async ({pimdata,page}) =>{
+test("Serach From Table", async ({pimdata,page}) =>{
     await pimpage.selectAndClickEmployee(page, pimdata.employeeid)
 })
 
 test("Verify To Add PersonalDetails",async ({pimdata,page}) => {
-    await pimpage.searchEmployeeByID(pimdata.employeeid)
+    await pimpage.addEmployeeWithoutLoginDetails(page, pimdata.firstname, pimdata.middlename, pimdata.lastname,pimdata.employeeid)
+    await expect(page.getByRole('heading', { name: 'Personal Details' })).toBeVisible()
+    await pimpage.linkClick("Employee List")
+    await pimpage.searchEmployeeByID(pimdata.employeeid,page)
     await pimpage.editUser(page,pimdata.employeeid)
     await pimpage.addPersonalDetails(pimdata.otherid,pimdata.licensenum,pimdata.licexpdate,page,pimdata.dob)
     await pimpage.linkClick("Employee List")
 })
 
-test("Verify to Delete Employee", async ({pimdata,page})=>{
-    await pimpage.searchEmployeeByID(pimdata.employeeid)
-    await pimpage.deleteEmployee(page,pimdata.employeeid)
+test("Verify To Add Duplicate Employee ID", async({pimdata,page}) =>{
+    await pimpage.add_btn.click()
+    await pimpage.employeeid.fill(pimdata.employeeid)
+    await pimpage.save_btn.click()
+    await expect(page.getByText('Employee Id already exists')).toBeVisible()
+})
+
+test("Verify to Validate Mandatory Fields", async ({page}) => {
+    await pimpage.add_btn.click()
+    await pimpage.save_btn.click()
+    await expect(page.locator('div').filter({ hasText: 'Required' }).first()).toBeVisible()
+    await expect(page.locator('span').filter({ hasText: 'Required' }).last()).toBeVisible()
 })
 
 })
