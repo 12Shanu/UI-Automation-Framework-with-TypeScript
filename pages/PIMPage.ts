@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { waitForDebugger } from "node:inspector";
+
 
 export class PIMPage{
     page:Page
@@ -19,6 +19,7 @@ export class PIMPage{
     readonly maritalstatus
     readonly dob
     readonly gender
+    readonly hintname
 
     constructor(page:Page){
         this.page =page
@@ -38,6 +39,7 @@ export class PIMPage{
         this.maritalstatus = page.locator("//label[contains(text(),'Marital Status')]/../..//div[@class='oxd-select-wrapper']")
         this.dob = page.locator("//label[contains(text(),'Date of Birth')]/../../div//input")
         this.gender = page.getByLabel('Female')
+        this.hintname = page.getByRole('textbox', { name: 'Type for hints...' }).first()
     }
 
     async addEmployeeWithoutLoginDetails(page:Page, firstname:string, middlename:string, lastname:string, employeeid:string){
@@ -124,7 +126,7 @@ export class PIMPage{
         
     async deleteEmployee(page:Page,employeeid: string) { 
         await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[2]/i`).isVisible()
-        await page.locator(`//div[@class='oxd-table-body']//div[text()='${employeeid}']/../following-sibling::div[7]//button[2]/i`).click()
+        await page.locator("//div[@class='oxd-table-body']//div/../following-sibling::div[7]//button[2]/i").click()
         await this.alert_delete.click()
     }
 
@@ -139,7 +141,9 @@ export class PIMPage{
         await expect(page.getByRole('heading', { name: 'Personal Details' })).toBeVisible()
     }
 
-    async addPersonalDetails(otherid:string,licensenum:string,expirydate:string,page:Page,dob:string){
+    async addPersonalDetails(updatedfirstname:string,otherid:string,licensenum:string,expirydate:string,page:Page,dob:string){
+        await this.firstname.click()
+        await this.firstname.fill(updatedfirstname)
         await this.otherid.click()
         await this.otherid.fill(otherid)
         await this.licensenumber.click()
@@ -157,4 +161,43 @@ export class PIMPage{
         await page.locator('button').filter({ hasText: 'Save' }).first().click()
     }
 
+    async searchByEmployeeName(page:Page){
+        await this.hintname.fill('sh')
+        await page.waitForSelector('[role="option"]');
+        const options = page.locator('[role="option"]').filter({
+        has: page.locator('span') // ensures real option
+        });
+        await expect(options.first()).toBeVisible();
+        const count = await options.count();
+        const randomIndex = Math.floor(Math.random() * count);
+        const selectedOption = options.nth(randomIndex);
+        // Wait before click (important)
+        await selectedOption.waitFor({ state: 'visible' });
+
+        // Get text BEFORE click (optional but useful)
+        const optionText = await selectedOption.innerText()
+        if (!optionText) {
+            throw new Error("Option text is null or empty");
+        }
+        await selectedOption.click();
+        const nameParts = optionText?.trim().split(/\s+/) || [];
+
+        let firstAndMiddle = "";
+
+        if (nameParts.length >= 3) {
+            // First + Middle
+            firstAndMiddle = nameParts[0] + " " + nameParts[1];
+        } else if (nameParts.length === 2) {
+            // Only First
+            firstAndMiddle = nameParts[0];
+        } else if (nameParts.length === 1) {
+            // Only one name
+            firstAndMiddle = nameParts[0];
+        }
+        console.log("actual:"+firstAndMiddle)
+        await this.search_btn.click()
+        const fm=await page.locator("//div[@class='oxd-table-body']/div/div/div[3]/div").textContent()
+        console.log("expected:"+fm)
+        expect(fm).toContain(firstAndMiddle)
+    }
 }

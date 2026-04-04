@@ -1,7 +1,5 @@
 import {test,expect} from "../fixture/testfixture"
 
-
-
 test("Verify Login With Valid Credential", async ({loginPage, loginData,page}) =>{
     await loginPage.navigateUrl()
     await loginPage.userLogin(loginData.username, loginData.password)
