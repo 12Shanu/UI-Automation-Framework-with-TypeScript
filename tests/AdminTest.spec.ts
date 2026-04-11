@@ -12,6 +12,6 @@ test("Add New User", async ({adminpage,admindata, page}) =>{
     await adminpage.deleteUser(admindata.username,page)
 })
 
-test.only("Search By EmployeeName", async ({adminpage,admindata,page})=>{
+test("Search By EmployeeName", async ({adminpage,admindata,page})=>{
     await adminpage.searchByEmployeeName(page,admindata.username)
 })

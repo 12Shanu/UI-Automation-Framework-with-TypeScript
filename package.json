@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:regression": "npx playwright test tests/AdminTest.spec.ts tests/PIMTest.spec.ts",
+    "test:allure": "playwright test && allure serve allure-results"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
-    "@types/node": "^25.5.2"
+  "@playwright/test": "^1.58.2",
+  "@types/node": "^25.5.2",
+  "allure-playwright": "^3.6.0"
   }
 }

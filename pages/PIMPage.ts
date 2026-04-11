@@ -20,6 +20,8 @@ export class PIMPage{
     readonly dob
     readonly gender
     readonly hintname
+    readonly year
+    readonly month
 
     constructor(page:Page){
         this.page =page
@@ -34,12 +36,14 @@ export class PIMPage{
         this.alert_delete = page.getByRole('button', { name: 'Yes, Delete' })
         this.otherid =page.locator("//label[text()='Other Id']/../../div//input")
         this.licensenumber = page.locator("//label[contains(text(),'License Number')]/../../div//input")
-        this.licenseexpirydate = page.locator("//label[contains(text(),'License Expiry')]/../../div//input")
+        this.licenseexpirydate = page.locator("//label[contains(text(),'License Expiry')]/../../div//i")
         this.nationalitydropdown = page.locator("//label[contains(text(),'Nationality')]/../..//div[@class='oxd-select-wrapper']")
         this.maritalstatus = page.locator("//label[contains(text(),'Marital Status')]/../..//div[@class='oxd-select-wrapper']")
-        this.dob = page.locator("//label[contains(text(),'Date of Birth')]/../../div//input")
+        this.dob = page.locator("//label[contains(text(),'Date of Birth')]/../../div//i")
         this.gender = page.getByLabel('Female')
         this.hintname = page.getByRole('textbox', { name: 'Type for hints...' }).first()
+        this.month = page.locator("//div[@class='oxd-calendar-selector-month-selected']")
+        this.year = page.locator("//div[@class='oxd-calendar-selector-year-selected']")
     }
 
     async addEmployeeWithoutLoginDetails(page:Page, firstname:string, middlename:string, lastname:string, employeeid:string){
@@ -148,22 +152,24 @@ export class PIMPage{
         await this.otherid.fill(otherid)
         await this.licensenumber.click()
         await this.licensenumber.fill(licensenum)
-        await this.licenseexpirydate.fill(expirydate)
+        await this.licenseexpirydate.click()
+        await this.handleCalender(page,"July","2026")
+        await page.pause()
         await this.nationalitydropdown.click()
         await page.getByText('Indian').waitFor()
         await page.getByText('Indian').click()
         await this.maritalstatus.click()
         await page.getByText('Married').waitFor()
         await page.getByText('Married').click()
-        await this.dob.fill(dob)
+        await this.dob.click()
+        await this.handleCalender(page,"November","1993")
        // await this.gender.click()
-       // await page.pause()
         await page.locator('button').filter({ hasText: 'Save' }).first().click()
     }
 
     async searchByEmployeeName(page:Page){
         await this.hintname.fill('sh')
-        await page.waitForSelector('[role="option"]');
+        await page.waitForSelector('[role="option"]')
         const options = page.locator('[role="option"]').filter({
         has: page.locator('span') // ensures real option
         });
@@ -199,5 +205,29 @@ export class PIMPage{
         const fm=await page.locator("//div[@class='oxd-table-body']/div/div/div[3]/div").textContent()
         console.log("expected:"+fm)
         expect(fm).toContain(firstAndMiddle)
+    }
+
+    async handleCalender(page:Page,month:string,year:string){
+        //await page.waitForSelector('[role="option"]')
+        await this.month.click()
+        await page.getByRole('menu').filter({hasText: month}).click()
+        await this.year.click()
+        await page.getByRole('menu').filter({hasText: year}).click()
+        const date = page.locator("//div[@class='oxd-calendar-dates-grid']")
+        const options = date.filter({
+        has: page.locator('div') // ensures real option
+        });
+        await expect(options.first()).toBeVisible();
+        const count = await options.count();
+        const randomIndex = Math.floor(Math.random() * count);
+        const selectedOption = options.nth(randomIndex);
+        // Wait before click (important)
+        await selectedOption.waitFor({ state: 'visible' });
+        // Get text BEFORE click (optional but useful)
+        const optionText = await selectedOption.innerText()
+        if (!optionText) {
+            throw new Error("Option text is null or empty");
+        }
+        await selectedOption.click();
     }
 }
