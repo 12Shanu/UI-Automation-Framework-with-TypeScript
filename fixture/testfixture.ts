@@ -4,7 +4,7 @@ import loginData from "../testdata/logindata.json"
 import pimdata from "../testdata/pimdata.json"
 import {DashboardPage} from "../pages/DashboardPage"
 import { PIMPage } from "../pages/PIMPage"
-import { generateEmployeeId } from "../util/dataUtil"
+import { generateEmployeeId,generateUsername } from "../util/dataUtil"
 import admindata from "../testdata/admindata.json"
 import { AdminPage } from "../pages/AdminPage"
 
@@ -16,6 +16,9 @@ type MyFixture={
     pimPage:PIMPage
     employee: {
     employeeId: string
+    }
+    username: {
+    userId: string
     }
     admindata: typeof admindata
     adminpage: AdminPage
@@ -50,7 +53,7 @@ export const test = base.extend<MyFixture>({
   },
 
   employee :async ({pimPage,page},use) =>{
-    const employeeId = generateEmployeeId();
+    const employeeId = generateEmployeeId()
     await pimPage.addEmployeeWithoutLoginDetails(page,pimdata.firstname,pimdata.middlename,pimdata.lastname,employeeId)
     await expect(page.getByRole('heading', { name: 'Personal Details' })).toBeVisible()
     await pimPage.linkClick("Employee List")
@@ -60,6 +63,11 @@ export const test = base.extend<MyFixture>({
   adminpage:async ({page},use) =>{
     const adminpage = new AdminPage(page)
     await use(adminpage)
+  },
+
+  username: async({},use)=>{
+    const userId = generateUsername()
+    await use({userId})
   }
 })
 

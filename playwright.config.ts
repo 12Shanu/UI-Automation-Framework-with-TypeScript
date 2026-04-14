@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { off } from 'node:cluster';
 
 /**
  * Read environment variables from file.
@@ -14,7 +15,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   retries:1,
-  workers:2,
+  workers:1,
   timeout:60000,
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -27,7 +28,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],
-    ['allure-playwright']
+    ['allure-playwright'],
+    ['html'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -36,22 +38,25 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    screenshot:"on-first-failure",
+    video:'off',
+    viewport:{width:1400, height:768},
+    headless: true
   },
 
   /* Configure projects for major browsers */
   projects: [
      {
       name: 'setup',
-      testMatch: /auth\.setup\.spec\.ts/,
+      testMatch: /auth\.setup\.ts/,
+      fullyParallel: false,
+      workers: 1,
     },
     {
       name: 'chromium',
       dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'],
-        screenshot:"on-first-failure",
-        trace:"retain-on-failure",
-        video:"retain-on-failure",
-        viewport:{width:1400, height:768},
+       
         channel:'chrome',
         //baseURL: 'https://opensource-demo.orangehrmlive.com/',
         storageState: 'storage/auth.json',
