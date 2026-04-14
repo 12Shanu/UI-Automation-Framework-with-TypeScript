@@ -1,7 +1,7 @@
 import{test,expect} from "../fixture/testfixture"
 
 test.beforeEach(async ({page,loginPage,dashboardPage}) => {
-    await loginPage.navigateUrl()
+    await loginPage.navigateUrl(page)
     await dashboardPage.moduleClick('Admin')
     await expect(page).toHaveURL(/admin\/viewSystemUsers/)
 })

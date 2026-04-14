@@ -154,7 +154,6 @@ export class PIMPage{
         await this.licensenumber.fill(licensenum)
         await this.licenseexpirydate.click()
         await this.handleCalender(page,"July","2026")
-        await page.pause()
         await this.nationalitydropdown.click()
         await page.getByText('Indian').waitFor()
         await page.getByText('Indian').click()

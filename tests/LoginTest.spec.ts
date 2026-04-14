@@ -1,7 +1,7 @@
 import {test,expect} from "../fixture/testfixture"
 
 test.beforeEach(async ({loginPage,page})=>{
-    await loginPage.navigateUrl()
+    await loginPage.navigateUrl(page)
 })
 
 test("Verify Login With Valid Credential", async ({loginPage, loginData,page}) =>{

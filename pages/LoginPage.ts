@@ -23,9 +23,8 @@ export class LoginPage{
         this.requirednd = page.locator('span').filter({ hasText: 'Required' }).last()
     }
 
-    async navigateUrl(){
-       await this.page.goto(
-        'https://opensource-demo.orangehrmlive.com/web/index.php/auth/login',
+    async navigateUrl(page:Page){
+       await page.goto('/web/index.php/auth/login',
      {
         timeout: 60000,
         waitUntil: 'domcontentloaded', // ✅ faster & stable
