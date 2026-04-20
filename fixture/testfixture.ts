@@ -7,6 +7,7 @@ import { PIMPage } from "../pages/PIMPage"
 import { generateEmployeeId,generateUsername } from "../util/dataUtil"
 import admindata from "../testdata/admindata.json"
 import { AdminPage } from "../pages/AdminPage"
+import { LeavePage } from "../pages/LeavePage"
 
 type MyFixture={
     loginPage:LoginPage
@@ -22,6 +23,7 @@ type MyFixture={
     }
     admindata: typeof admindata
     adminpage: AdminPage
+    leavePage: LeavePage
 }
 
 export const test = base.extend<MyFixture>({
@@ -68,6 +70,11 @@ export const test = base.extend<MyFixture>({
   username: async({},use)=>{
     const userId = generateUsername()
     await use({userId})
+  },
+
+  leavePage: async ({page},use)=>{
+    const leavePage = new LeavePage(page)
+    await use(leavePage)
   }
 })
 

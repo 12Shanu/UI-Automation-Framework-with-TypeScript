@@ -1,6 +1,7 @@
 import { Page,expect } from "@playwright/test"
+import { BasePage } from "./BasePage"
 
-export class AdminPage{
+export class AdminPage extends BasePage{
     page:Page
     readonly add_btn
     readonly role
@@ -15,6 +16,7 @@ export class AdminPage{
     readonly alert_delete
 
     constructor(page:Page){
+        super(page)
         this.page=page
         this.add_btn = page.getByRole('button', { name: 'Add' })
         this.role = page.locator("//label[normalize-space()='User Role']/../../div[2]//i")
@@ -60,7 +62,7 @@ export class AdminPage{
         await this.alert_delete.click()
     }
 
-    async searchByEmployeeName(page:Page,username:string){
+    async searchByEmployeeName(page:Page){
         await page.locator("//div[contains(@class,'oxd-table-body')]//div[@role='row']").isVisible()
         const rows = page.locator("//div[contains(@class,'oxd-table-body')]//div[@role='row']")
         await expect(rows.first()).toBeVisible();
@@ -92,26 +94,5 @@ export class AdminPage{
         expect(employeename).toContain(matchname)
         console.log("Expected Name:"+employeename)
         console.log("Actual Name:"+matchname)
-    }
-
-    async handleAutosuggestion(page:Page){
-        await page.waitForSelector('[role="option"]');
-        const options = page.locator('[role="option"]').filter({
-        has: page.locator('span') // ensures real option
-        });
-        await expect(options.first()).toBeVisible();
-        const count = await options.count();
-        const randomIndex = Math.floor(Math.random() * count);
-        const selectedOption = options.nth(randomIndex);
-        // Wait before click (important)
-        await selectedOption.waitFor({ state: 'visible' });
-        // Get text BEFORE click (optional but useful)
-        const option = await selectedOption.innerText()
-        if (!option) {
-            throw new Error("Option text is null or empty");
-        }
-        await selectedOption.click();
-        console.log("handle:"+option)
-        return option
     }
 }

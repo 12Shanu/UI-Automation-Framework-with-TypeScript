@@ -13,5 +13,5 @@ test("Add New User", async ({adminpage,admindata, page,username}) =>{
 })
 
 test("Search By EmployeeName", async ({adminpage,username,page})=>{
-    await adminpage.searchByEmployeeName(page,username.userId)
+    await adminpage.searchByEmployeeName(page)
 })

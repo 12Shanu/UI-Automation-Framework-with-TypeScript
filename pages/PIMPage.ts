@@ -1,7 +1,8 @@
 import { expect, Locator, Page } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 
-export class PIMPage{
+export class PIMPage extends BasePage{
     page:Page
     readonly add_btn
     readonly firstname
@@ -24,6 +25,7 @@ export class PIMPage{
     readonly month
 
     constructor(page:Page){
+        super(page)
         this.page =page
         this.add_btn = page.getByRole('button', { name: 'Add' })
         this.firstname = page.getByRole('textbox', { name: 'First Name' })
@@ -204,29 +206,5 @@ export class PIMPage{
         const fm=await page.locator("//div[@class='oxd-table-body']/div/div/div[3]/div").textContent()
         console.log("expected:"+fm)
         expect(fm).toContain(firstAndMiddle)
-    }
-
-    async handleCalender(page:Page,month:string,year:string){
-        //await page.waitForSelector('[role="option"]')
-        await this.month.click()
-        await page.getByRole('menu').filter({hasText: month}).click()
-        await this.year.click()
-        await page.getByRole('menu').filter({hasText: year}).click()
-        const date = page.locator("//div[@class='oxd-calendar-dates-grid']")
-        const options = date.filter({
-        has: page.locator('div') // ensures real option
-        });
-        await expect(options.first()).toBeVisible();
-        const count = await options.count();
-        const randomIndex = Math.floor(Math.random() * count);
-        const selectedOption = options.nth(randomIndex);
-        // Wait before click (important)
-        await selectedOption.waitFor({ state: 'visible' });
-        // Get text BEFORE click (optional but useful)
-        const optionText = await selectedOption.innerText()
-        if (!optionText) {
-            throw new Error("Option text is null or empty");
-        }
-        await selectedOption.click();
     }
 }
