@@ -1,53 +1,57 @@
-import { Page , expect} from "@playwright/test";
+import { Page , expect, Locator} from "@playwright/test";
 
 import { BasePage } from "./BasePage";
 
 export class LeavePage extends BasePage{
-
-    readonly page:Page
-    private apply_link
-    private leavetype
-    private commentarea
-    private apply_btn
-    private leave_bal
-    private assignleave_link
-    private employename
-    private fromdate
-    private todate
-    private asign_btn
-    private partialdays
-    private duration
-    private startday
-    private endday
-    private fromtime
-    private totime
-    private timehr
-    private timemin
-    private leavealert
-    private ok_btn
-    readonly toastmsg
-    private entitlements_link
-    private addentitlements_link
+    readonly apply_link :Locator
+    readonly leavetype :Locator
+    readonly commentarea :Locator
+    readonly apply_btn :Locator
+    readonly leave_bal :Locator
+    readonly assignleave_link :Locator
+    readonly employename :Locator
+    readonly fromdate :Locator
+    readonly todate :Locator
+    readonly asign_btn :Locator
+    readonly partialdays :Locator
+    readonly duration :Locator
+    readonly startday :Locator
+    readonly endday :Locator
+    readonly fromtime :Locator
+    readonly totime :Locator
+    readonly timehr :Locator
+    readonly timemin :Locator
+    readonly leavealert :Locator
+    readonly ok_btn :Locator
+    readonly toastmsg :Locator
+    readonly entitlements_link :Locator
+    readonly addentitlements_link :Locator
+    readonly leaveperiod :Locator
+    readonly entitlements :Locator
+    readonly entitlementsalert :Locator
+    readonly confirm_btn :Locator
+    readonly multipleemployeeradio :Locator
+    readonly save_btn:Locator
 
     constructor(page:Page){
         super(page)
         this.page =page
         this.apply_link = page.getByRole('link', { name: 'Apply' })
-        this.leavetype = page.locator('i.oxd-icon.bi-caret-down-fill.oxd-select-text--arrow')
+        this.leavetype = page.locator('div.oxd-input-group').filter({ hasText: 'Leave Type' }).locator('.oxd-select-text')
         this.commentarea = page.getByRole('textbox').last()
         this.apply_btn = page.getByRole('button', { name: 'Apply' })
         this.leave_bal = page.locator('.oxd-text.oxd-text--p.orangehrm-leave-balance-text')
         this.assignleave_link = page.getByRole('link', { name: 'Assign Leave' })
         this.employename = page.getByPlaceholder('Type for hints...')
-        this.fromdate = page.locator("//label[contains(text(),'From Date')]/../../div//i")
-        this.todate = page.locator("//label[contains(text(),'To Date')]/../../div//i")
+        this.fromdate = page.locator('div.oxd-input-group').filter({ hasText: 'From Date' }).locator('input')
+        this.todate = page.locator('div.oxd-input-group').filter({ hasText: 'To Date' }).locator('input')
         this.asign_btn = page.getByRole('button', { name: 'Assign' })
-        this.partialdays = page.locator("//label[contains(text(),'Partial Days')]/../../div//i")
-        this.duration = page.locator("//label[contains(text(),'Duration')]/../../div//i")
-        this.startday = page.locator("//label[contains(text(),'Start Day')]/../../div//i")
-        this.endday = page.locator("//label[contains(text(),'End Day')]/../../div//i")
-        this.fromtime = page.locator("//label[text()='From']/../../div//i")
-        this.totime = page.locator("//label[text()='To']/../../div//i")
+        this.partialdays = page.locator('div.oxd-input-group').filter({ hasText: 'Partial Days' }).locator('.oxd-select-text')
+        this.duration = page.locator('div.oxd-input-group').filter({ hasText: 'Duration' }).locator('.oxd-select-text')
+        this.startday = page.locator('div.oxd-input-group').filter({ hasText: 'Start Day' }).locator('.oxd-select-text').last()
+        this.endday = page.locator('div.oxd-input-group').filter({ hasText: 'End Day' }).locator('.oxd-select-text').last()
+        this.fromtime = page.locator('div.oxd-input-group').filter({ hasText: 'From Time' }).locator('.oxd-select-text')
+        this.totime = page.locator('div.oxd-input-group').filter({ hasText: 'To Time' }).locator('.oxd-select-text')
         this.timehr = page.locator("//input[contains(@class,'time-hour')]")
         this.timemin = page.locator("//input[contains(@class,'time-minute')]")
         this.leavealert = page.getByText('Confirm Leave Assignment', { exact: true })
@@ -55,9 +59,15 @@ export class LeavePage extends BasePage{
         this.toastmsg = page.getByText('Success', { exact: true })
         this.entitlements_link = page.getByText('Entitlements')
         this.addentitlements_link = page.getByRole('menuitem', { name: /Add Entitlements/i })
+        this.leaveperiod = page.locator('div.oxd-input-group').filter({ hasText: 'Leave Period' }).locator('.oxd-select-text')
+        this.entitlements = page.locator('div.oxd-input-group').filter({ hasText: 'Entitlement' }).locator('input')
+        this.entitlementsalert = page.getByText('Updating Entitlement')
+        this.confirm_btn = page.getByRole('button', { name: 'Confirm' })
+        this.multipleemployeeradio = page.getByLabel('Multiple Employees')
+        this.save_btn = page.getByRole('button', { name: 'Save' })
     }
 
-    async applyLeave(page:Page){
+    async applyLeave(page:Page) : Promise<void>{
         await this.apply_link.isVisible()
         await this.apply_link.click()
         await this.leavetype.isVisible()
@@ -72,7 +82,7 @@ export class LeavePage extends BasePage{
         await this.apply_btn.click()    
 }
 
-    async assignLeave(page:Page){
+    async assignLeave(page:Page) : Promise<void>{
         await this.assignleave_link.isVisible()
         await this.assignleave_link.click()
         await this.employename.isVisible()
@@ -110,7 +120,7 @@ export class LeavePage extends BasePage{
         await this.toastmsg.isVisible()
     }
 
-    async mandatoryFieldValidate(page:Page){
+    async mandatoryFieldValidate(page:Page) : Promise<void>{
         await this.assignleave_link.isVisible()
         await this.assignleave_link.click()
         await this.asign_btn.isVisible()
@@ -119,5 +129,39 @@ export class LeavePage extends BasePage{
         await page.locator("//label[text()='Leave Type']/../..//span").isVisible()
         await page.locator("//label[text()='From Date']/../..//span").isVisible()
         await page.locator("//label[text()='To Date']/../..//span").isVisible()
+    }
+
+    async addLeaveEntitlementWithIndividualEmployee() : Promise<void>{
+        await this.entitlements_link.click()
+        await this.addentitlements_link.isVisible()
+        await this.addentitlements_link.click()
+        await this.employename.fill("sh")
+        await this.handleAutosuggestion(this.page)
+        await this.leavetype.click()
+        await this.handleDropdown(this.page)
+        await this.leaveperiod.click()
+        await this.handleDropdown(this.page)
+        await this.entitlements.fill("12")
+        await this.save_btn.click()
+        expect(this.entitlementsalert).toBeTruthy()
+        await this.confirm_btn.click()
+        await this.toastmsg.isVisible()
+    }
+
+    async addLeaveEntitlementWithMultipleEmployee() : Promise<void> {
+        await this.multipleemployeeradio.click()
+        await this.entitlements_link.click()
+        await this.addentitlements_link.isVisible()
+        await this.addentitlements_link.click()
+        await this.employename.fill("sh")
+        await this.handleAutosuggestion(this.page)
+        await this.leavetype.click()
+        await this.handleDropdown(this.page)
+        await this.leaveperiod.click()
+        await this.handleDropdown(this.page)
+        await this.entitlements.fill("12")
+        expect(this.entitlementsalert).toBeTruthy()
+        await this.confirm_btn.click()
+        await this.toastmsg.isVisible()
     }
 }

@@ -34,6 +34,7 @@ export const test = base.extend<MyFixture>({
 
   dashboardPage : async ({page},use) =>{
     const dashboardPage = new DashboardPage(page)
+    await page.goto('/web/index.php/dashboard/index')
     await use(dashboardPage)
   },
 

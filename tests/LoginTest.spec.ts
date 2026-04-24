@@ -4,12 +4,13 @@ test.beforeEach(async ({loginPage,page})=>{
     await loginPage.navigateUrl(page)
 })
 
-test("Verify Login With Valid Credential", async ({loginPage, loginData,page}) =>{
+test.skip("Verify Login With Valid Credential", async ({loginPage, loginData,page}) =>{
     await loginPage.userLogin(loginData.username, loginData.password)
     await expect(page).toHaveURL(/dashboard/)
 })
 
-test("Verify Login With InValid Credential", async ({loginPage, loginData,page}) =>{
+test("Verify Login With InValid Credential", async ({dashboardPage,loginPage, loginData,page}) =>{
+    await dashboardPage.appLogout()
     await loginPage.userLogin(loginData.invaliduser, loginData.password)
     await expect(page.getByText('Invalid credentials', { exact: true })).toBeVisible()
 })

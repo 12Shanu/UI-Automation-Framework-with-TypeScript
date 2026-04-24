@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:regression": "npx playwright test tests/AdminTest.spec.ts tests/PIMTest.spec.ts --headed",
+    "test:regression": "npx playwright test tests/AdminTest.spec.ts tests/PIMTest.spec.ts tests/LeaveTest.spec.ts --headed",
     "test:allure": "playwright test && allure serve allure-results"
   },
   "keywords": [],
