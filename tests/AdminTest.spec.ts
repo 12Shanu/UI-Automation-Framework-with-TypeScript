@@ -5,12 +5,12 @@ test.beforeEach(async ({page,dashboardPage}) => {
     await expect(page).toHaveURL(/admin\/viewSystemUsers/)
 })
 
-test("Add New User", async ({adminpage,admindata, page,username}) =>{
+test("Add New User @integration", async ({adminpage,admindata, page,username}) =>{
     await adminpage.addUser(page,username.userId,admindata.password,admindata.confirmpassword)
     await adminpage.searchByUsername(username.userId,page)
     await adminpage.deleteUser(username.userId,page)
 })
 
-test("Search By EmployeeName", async ({adminpage,username,page})=>{
+test("Search By EmployeeName @unit", async ({adminpage,username,page})=>{
     await adminpage.searchByEmployeeName(page)
 })
