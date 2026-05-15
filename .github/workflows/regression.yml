@@ -2,7 +2,7 @@ name: Nightly Regression
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Every day at midnight
+    - cron: '30 18 * * *' # Every day at midnight IST
 
 jobs:
   test:
@@ -24,11 +24,14 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    # ✅ IMPORTANT: better logging
-    - name: Run Playwright tests
-      run: npx playwright test --grep "@regression|@integration" --reporter=list
+    - name: Run Regression & Integration Tests
+      run: npx playwright test --grep "@regression|@integration"
 
-    # ✅ Always upload HTML report
+    # Optional Debug Step
+    - name: Verify Allure Results
+      if: always()
+      run: ls -la allure-results
+
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
       if: always()
@@ -37,7 +40,6 @@ jobs:
         path: playwright-report/
         retention-days: 30
 
-    # ✅ (Optional but BEST) Allure report
     - name: Generate Allure Report
       if: always()
       run: |

@@ -25,7 +25,7 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Run Smoke Playwright tests
-      run: npx playwright test --grep "@smoke" --reporter=list
+      run: npx playwright test --grep "@smoke"
 
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
