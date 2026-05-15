@@ -13,7 +13,7 @@ test("Verify Assign Leave Functionality @integration", async ({leavePage,page})=
     await leavePage.assignLeave(page)   
 })
 
-test("Verify Mandatory Fields @unit", async ({leavePage,page})=>{
+test("Verify Mandatory Fields @regression", async ({leavePage,page})=>{
     await leavePage.mandatoryFieldValidate(page)
 })
 

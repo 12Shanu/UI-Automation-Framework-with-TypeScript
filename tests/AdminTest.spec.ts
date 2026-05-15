@@ -11,6 +11,6 @@ test("Add New User @integration", async ({adminpage,admindata, page,username}) =
     await adminpage.deleteUser(username.userId,page)
 })
 
-test("Search By EmployeeName @unit", async ({adminpage,username,page})=>{
+test("Search By EmployeeName @regression", async ({adminpage,username,page})=>{
     await adminpage.searchByEmployeeName(page)
 })

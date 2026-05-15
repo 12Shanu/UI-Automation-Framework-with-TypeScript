@@ -1,10 +1,8 @@
-name: Playwright Tests
+name: Nightly Regression
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  schedule:
+    - cron: '0 0 * * *' # Every day at midnight
 
 jobs:
   test:
@@ -28,7 +26,7 @@ jobs:
 
     # ✅ IMPORTANT: better logging
     - name: Run Playwright tests
-      run: npx playwright test --reporter=list
+      run: npx playwright test --grep "@regression|@integration" --reporter=list
 
     # ✅ Always upload HTML report
     - name: Upload Playwright Report

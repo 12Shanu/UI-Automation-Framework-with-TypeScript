@@ -19,7 +19,7 @@ test("Verify Forgot Functionality @smoke", async ({loginPage, loginData, page}) 
     await loginPage.forgotPassword(page, loginData.username)
 })
 
-test("Validation Check for Manadatory Fields @unit", async ({loginPage,loginData}) => {
+test("Validation Check for Manadatory Fields @regression", async ({loginPage,loginData}) => {
     await loginPage.submitbtn.click()
     await loginPage.validationCheck()
 })
