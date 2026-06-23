@@ -14,7 +14,7 @@ import { off } from 'node:cluster';
  */
 export default defineConfig({
   testDir: './tests',
-  retries:1,
+  //retries:1,
   timeout:60000,
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -40,7 +40,6 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot:"on-first-failure",
     video:'off',
-    viewport:{width:1400, height:768},
     headless: true
   },
 
@@ -56,12 +55,12 @@ export default defineConfig({
       name: 'chromium',
       dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'],
-       
-        channel:'chrome',
-        storageState: 'storage/auth.json',
-       },
-  
+      viewport:{width:1400, height:768},
+      channel:'chrome',
+      storageState: 'storage/auth.json',
     },
+  
+     },
 
     // {
     //   name: 'firefox',
@@ -74,10 +73,14 @@ export default defineConfig({
     // },
 
     /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
+  // {
+  //   name: 'Mobile Chrome',
+  //   dependencies: ['setup'],
+  //   use: {
+  //     ...devices['Pixel 5'],
+  //     storageState: 'storage/auth.json',
+  //   },
+  // }
     // {
     //   name: 'Mobile Safari',
     //   use: { ...devices['iPhone 12'] },

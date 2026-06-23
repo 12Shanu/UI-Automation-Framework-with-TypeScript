@@ -31,7 +31,7 @@ test("Verify To Add Duplicate Employee ID @regression", async({page,pimPage,empl
     await expect(page.getByText('Employee Id already exists')).toBeVisible()
 })
 
-test("Verify to Validate Mandatory Fields @regression", async ({page,pimPage}) => {
+test.only("Verify to Validate Mandatory Fields @regression", async ({page,pimPage}) => {
     await pimPage.add_btn.click()
     await pimPage.save_btn.click()
     await expect(page.locator('div').filter({ hasText: 'Required' }).first()).toBeVisible()
